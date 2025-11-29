@@ -18,7 +18,7 @@ class UsersSeeder extends Seeder
             ['username' => 'Aida'],
             [
                 'name' => 'Aida',
-                'email' => 'aida@hasak',
+                'email' => 'aida@hasak.ba',
                 'password' => bcrypt($this->password('SEED_AIDA_PASSWORD', 'Aida')),
             ]
         );
