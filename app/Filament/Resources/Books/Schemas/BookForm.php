@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -15,23 +16,21 @@ class BookForm
                     ->required(),
                 TextInput::make('author')
                     ->required(),
-                TextInput::make('series_id')
-                    ->numeric(),
+                Select::make('series.title')
+                    ->relationship('series', 'title'),
                 TextInput::make('part_number')
                     ->numeric(),
                 TextInput::make('publisher'),
-                TextInput::make('country_id')
-                    ->numeric(),
-                TextInput::make('language_id')
-                    ->numeric(),
-                TextInput::make('genre_id')
-                    ->numeric(),
+                Select::make('country_id')
+                    ->relationship('country', 'name'),
+                Select::make('language_id')
+                    ->relationship('language', 'name'),
+                Select::make('genre_id')
+                    ->relationship('genre', 'name'),
                 TextInput::make('original_title'),
                 TextInput::make('year'),
-                TextInput::make('position'),
+                //TextInput::make('position'),
                 TextInput::make('isbn'),
-                TextInput::make('user_id')
-                    ->numeric(),
             ]);
     }
 }

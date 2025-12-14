@@ -13,8 +13,6 @@ class GenreForm
             ->components([
                 TextInput::make('name')
                     ->required(),
-                TextInput::make('user_id')
-                    ->numeric(),
             ]);
     }
 }

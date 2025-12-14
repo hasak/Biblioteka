@@ -15,8 +15,6 @@ class CountryForm
                     ->required(),
                 TextInput::make('code')
                     ->required(),
-                TextInput::make('user_id')
-                    ->numeric(),
             ]);
     }
 }
