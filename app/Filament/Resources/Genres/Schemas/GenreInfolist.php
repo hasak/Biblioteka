@@ -12,15 +12,12 @@ class GenreInfolist
         return $schema
             ->components([
                 TextEntry::make('name'),
-                TextEntry::make('user_id')
-                    ->numeric()
-                    ->placeholder('-'),
+                TextEntry::make('user.username')
+                    ->label('Added by'),
                 TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->dateTime(),
                 TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->dateTime(),
             ]);
     }
 }

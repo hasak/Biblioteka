@@ -17,8 +17,6 @@ class CountryForm
                 TextInput::make('code')
                     ->required()
                     ->unique(ignoreRecord: true),
-                TextInput::make('user_id')
-                    ->numeric(),
             ]);
     }
 }

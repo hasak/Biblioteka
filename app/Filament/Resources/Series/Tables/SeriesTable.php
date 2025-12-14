@@ -20,23 +20,19 @@ class SeriesTable
                     ->searchable(),
                 TextColumn::make('author')
                     ->searchable(),
-                TextColumn::make('genre_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('position'),
+                TextColumn::make('genre.name')
+                    ->label('Genre')
+                    ->searchable(),
+                //TextColumn::make('position'),
                 IconColumn::make('is_completed')
                     ->boolean(),
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('user.username')
+                    ->label('Added by')
+                    ->searchable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime(),
             ])
             ->filters([
                 //

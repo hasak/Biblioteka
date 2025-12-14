@@ -14,22 +14,17 @@ class SeriesInfolist
             ->components([
                 TextEntry::make('title'),
                 TextEntry::make('author'),
-                TextEntry::make('genre_id')
-                    ->numeric()
-                    ->placeholder('-'),
-                TextEntry::make('position')
-                    ->placeholder('-'),
+                TextEntry::make('genre.name')
+                    ->label('Genre'),
+                //TextEntry::make('position'),
                 IconEntry::make('is_completed')
                     ->boolean(),
-                TextEntry::make('user_id')
-                    ->numeric()
-                    ->placeholder('-'),
+                TextEntry::make('user.username')
+                    ->label('Added by'),
                 TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->dateTime(),
                 TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->dateTime(),
             ]);
     }
 }

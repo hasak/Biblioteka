@@ -14,8 +14,6 @@ class GenreForm
                 TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true),
-                TextInput::make('user_id')
-                    ->numeric(),
             ]);
     }
 }

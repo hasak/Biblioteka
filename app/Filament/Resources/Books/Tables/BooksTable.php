@@ -19,40 +19,40 @@ class BooksTable
                     ->searchable(),
                 TextColumn::make('author')
                     ->searchable(),
-                TextColumn::make('series_id')
+                TextColumn::make('series.title')
                     ->numeric()
-                    ->sortable(),
+                    ->toggleable(),
                 TextColumn::make('part_number')
+                    ->label('Part')
                     ->numeric()
-                    ->sortable(),
+                    ->toggleable(),
                 TextColumn::make('publisher')
-                    ->searchable(),
-                TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('language_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('genre_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('country.name')
+                    ->toggleable(),
+                TextColumn::make('language.name')
+                    ->toggleable(),
+                TextColumn::make('genre.name')
+                    ->toggleable(),
                 TextColumn::make('original_title')
-                    ->searchable(),
-                TextColumn::make('year'),
-                TextColumn::make('position'),
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('year')
+                    ->toggleable(),
+                //TextColumn::make('position'),
                 TextColumn::make('isbn')
-                    ->searchable(),
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('user.username')
+                    ->label('Added by')
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('updated_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
                 //
