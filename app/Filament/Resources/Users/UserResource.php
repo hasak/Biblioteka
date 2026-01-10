@@ -15,6 +15,11 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Resources\Users\RelationManagers\BooksRelationManager;
+use App\Filament\Resources\Users\RelationManagers\GenresRelationManager;
+use App\Filament\Resources\Users\RelationManagers\SeriesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CountriesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\LanguagesRelationManager;
 
 class UserResource extends Resource
 {
@@ -40,8 +45,11 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\RolesRelationManager::class,
-            RelationManagers\PermissionsRelationManager::class,
+            BooksRelationManager::class,
+            CountriesRelationManager::class,
+            GenresRelationManager::class,
+            LanguagesRelationManager::class,
+            SeriesRelationManager::class,
         ];
     }
 
