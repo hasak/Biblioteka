@@ -19,4 +19,8 @@ class Country extends Model
     function books(){
         return $this->hasMany(Book::class);
     }
+
+    function purchasedBooks(){
+        return $this->hasMany(Book::class, 'purchased_country_id');
+    }
 }

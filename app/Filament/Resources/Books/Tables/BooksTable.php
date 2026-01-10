@@ -2,12 +2,16 @@
 
 namespace App\Filament\Resources\Books\Tables;
 
+use App\Models\Book;
+use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 
 class BooksTable
 {
@@ -15,44 +19,70 @@ class BooksTable
     {
         return $table
             ->columns([
+                ImageColumn::make('cover')
+                    ->disk('public')
+                    ->imageHeight(60)
+                    ->toggleable(),
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('author')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('series.title')
                     ->numeric()
+                    ->searchable()
+                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('part_number')
                     ->label('Part')
                     ->numeric()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('publisher')
-                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('year')
+                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('country.name')
-                    ->toggleable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('language.name')
-                    ->toggleable(),
-                TextColumn::make('genre.name')
                     ->toggleable(),
                 TextColumn::make('original_title')
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('genre.name')
                     ->toggleable(),
-                TextColumn::make('year')
+                TextColumn::make('position')
+                    ->toggleable()
+                    ->badge()
+                    ->color('gray'),
+                TextColumn::make('is_read')
+                    ->date(fn ($record) => $record->is_read ? ($record->read_date ? 'j. n. Y.' : '') : '')
+                    ->sortable(['read_date'])
+                    ->toggleable()
+                    ->icon(fn ($record) => $record->is_read ? Heroicon::OutlinedCheckCircle : Heroicon::OutlinedXCircle)
+                    ->iconColor(fn ($record) => $record->is_read ? 'success' : 'danger')
+                    ->state(fn ($record) => $record->is_read ? ($record->read_date ?? '1999-06-30') : '1999-06-30'),
+                TextColumn::make('purchasedIn')
+                    ->sortable(['purchasedCountry.name'])
                     ->toggleable(),
-                //TextColumn::make('position'),
+                TextColumn::make('purchased_date')
+                    ->label('Date of purchase')
+                    ->date('j. n. Y.')
+                    ->toggleable(),
                 TextColumn::make('isbn')
-                    ->searchable()
-                    ->toggleable(),
+                    ->label('ISBN')
+                    ->searchable(),
                 TextColumn::make('user.username')
                     ->label('Added by')
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->toggleable(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->toggleable(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

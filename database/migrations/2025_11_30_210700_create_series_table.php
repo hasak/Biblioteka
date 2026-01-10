@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('title');
             $table->string('author');
             $table->foreignId('genre_id')->nullable()->constrained();
-            $table->geometry('position','point')->nullable();
             $table->boolean('is_completed')->default(false);
             $table->foreignId('user_id')->nullable()->constrained();
             $table->timestamps();
