@@ -33,11 +33,11 @@ class UsersTable
                     ->wrap()
                     ->toggleable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('j. n. Y. @ G:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('j. n. Y. @ G:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

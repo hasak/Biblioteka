@@ -16,14 +16,17 @@ class GenresTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('user.username')
                     ->label('Added by')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

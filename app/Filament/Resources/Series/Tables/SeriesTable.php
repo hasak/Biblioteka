@@ -17,22 +17,29 @@ class SeriesTable
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('author')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('genre.name')
-                    ->label('Genre')
-                    ->searchable(),
-                //TextColumn::make('position'),
+                    ->toggleable(),
+                TextColumn::make('position')
+                    ->toggleable()
+                    ->badge()
+                    ->color('gray'),
                 IconColumn::make('is_completed')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(),
                 TextColumn::make('user.username')
                     ->label('Added by')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime(),
+                    ->dateTime('j. n. Y. @ G:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

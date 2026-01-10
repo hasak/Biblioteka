@@ -10,7 +10,6 @@ class Series extends Model
         'title',
         'author',
         'genre_id',
-        'position',
         'is_completed',
         'user_id',
     ];

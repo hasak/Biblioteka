@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
+use App\Models\Book;
+
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
