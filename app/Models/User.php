@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -46,5 +47,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    function books(){
+        return $this->hasMany(Book::class);
+    }
+
+    function countries(){
+        return $this->hasMany(Country::class);
+    }
+
+    function genres(){
+        return $this->hasMany(Genre::class);
+    }
+
+    function languages(){
+        return $this->hasMany(Language::class);
+    }
+
+    function series(){
+        return $this->hasMany(Series::class);
     }
 }

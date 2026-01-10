@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Resources\Languages\RelationManagers\BooksRelationManager;
 
 class LanguageResource extends Resource
 {
@@ -40,7 +41,7 @@ class LanguageResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            BooksRelationManager::class
         ];
     }
 

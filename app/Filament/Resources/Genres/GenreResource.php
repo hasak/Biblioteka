@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Resources\Genres\RelationManagers\BooksRelationManager;
 
 class GenreResource extends Resource
 {
@@ -40,7 +41,7 @@ class GenreResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            BooksRelationManager::class
         ];
     }
 
