@@ -21,7 +21,7 @@ class SeriesResource extends Resource
 {
     protected static ?string $model = Series::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedViewColumns;
 
     public static function form(Schema $schema): Schema
     {

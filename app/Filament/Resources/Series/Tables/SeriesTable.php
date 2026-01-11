@@ -30,6 +30,7 @@ class SeriesTable
                     ->color('gray'),
                 IconColumn::make('is_completed')
                     ->boolean()
+                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('user.username')
                     ->label('Added by')
