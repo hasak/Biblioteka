@@ -8,7 +8,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
-class UsersSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     public function run(): void
     {
