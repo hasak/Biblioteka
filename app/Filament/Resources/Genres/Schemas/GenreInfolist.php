@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Genres\Schemas;
 
+use Filament\Support\Enums\TextSize;
+use Filament\Support\Enums\FontWeight;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -9,15 +12,15 @@ class GenreInfolist
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextEntry::make('name'),
-                TextEntry::make('user.username')
-                    ->label('Added by'),
-                TextEntry::make('created_at')
-                    ->dateTime(),
-                TextEntry::make('updated_at')
-                    ->dateTime(),
-            ]);
+        return $schema->schema([
+            Section::make('Basic information')->schema([
+                TextEntry::make('name')->size(TextSize::Large)->weight(FontWeight::Bold),
+            ]),
+            Section::make('Meta')->schema([
+                TextEntry::make('user.username')->label('Created by'),
+                TextEntry::make('created_at')->dateTime(),
+                TextEntry::make('updated_at')->dateTime(),
+            ])->collapsed(),
+        ]);
     }
 }
