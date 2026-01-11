@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use App\Models\User;
 
-class UsersSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     public function run(): void
     {
