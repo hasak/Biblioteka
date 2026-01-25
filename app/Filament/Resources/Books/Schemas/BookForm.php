@@ -2,12 +2,18 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
+use App\Services\BookApi;
+use Filament\Actions\Action;
+use Filament\Support\Icons\Heroicon;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DatePicker;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class BookForm
 {
@@ -64,7 +70,36 @@ class BookForm
                 TextInput::make('purchased_city'),
                 DatePicker::make('purchased_date'),
                 TextInput::make('isbn')
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->suffixAction(
+                        Action::make('fetch')
+                            ->icon(Heroicon::OutlinedBarsArrowDown)
+                            ->tooltip('Fetch book data from ISBN')
+                            ->disabled(fn (Get $get) => blank($get('isbn')))
+                            ->action(function (Get $get, Set $set){
+                                $isbn = $get('isbn');
+                                if(!$isbn)
+                                    return;
+                                $data = BookApi::fromIsbn($isbn);
+                                if(!$data){
+                                    Notification::make()
+                                        ->title('Book not found')
+                                        ->danger()
+                                        ->send();
+                                    return;
+                                }
+                                foreach($data as $field=>$value) {
+                                    if($value && !$get($field)) {
+                                        $set($field,$value);
+                                    }
+                                }
+                                Notification::make()
+                                    ->title('Book data loaded')
+                                    ->success()
+                                    ->send();
+                            })
+                    ),
             ]);
     }
 }
