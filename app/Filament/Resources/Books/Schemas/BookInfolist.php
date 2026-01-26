@@ -29,24 +29,29 @@ class BookInfolist
                     ->extraImgAttributes(['style' => "border-radius: 0.75rem;"]),
                 Grid::make(1)->schema([
                     Section::make()->schema([
-                        TextEntry::make('title')->size(TextSize::Large)->weight(FontWeight::Bold),
+                        TextEntry::make('title')->hiddenLabel()->weight(FontWeight::Bold)->extraAttributes(['style' => 'font-size: 2rem;']),
                         TextEntry::make('author'),
                         Grid::make(3)->schema([
-                            TextEntry::make('series.title')->label('Series')->visible(fn ($record) => $record->series != null)->columnSpan(2),
+                            TextEntry::make('series.title')->label('Series')->visible(fn ($record) => $record->series != null),
                             TextEntry::make('part_number')->label('Part')->visible(fn ($record) => $record->part_number != null || $record->series != null),
+                            TextEntry::make('year'),
                         ]),
                         Grid::make(3)->schema([
                             TextEntry::make('genre.name')->label('Genre'),
                             TextEntry::make('language.name')->label('Language'),
-                            TextEntry::make('year'),
+                            TextEntry::make('country.name')->label('Publishing country'),
                         ]),
-                        TextEntry::make('isbn')->label('ISBN')->copyable(),
+                        Grid::make(3)->schema([
+                            TextEntry::make('publisher'),
+                            TextEntry::make('original_title'),
+                            TextEntry::make('isbn')->label('ISBN')->copyable(),
+                        ]),
                     ]),
                     Grid::make(12)->schema([
                         Section::make('Shelf position')->schema([
                             ShelfPositionEntry::make('shelf_position')->hiddenLabel(),
-                        ])->columnSpan(4),
-                        Section::make('Purchase')->schema([
+                        ])->columnSpan(3),
+                        Section::make('Obtained')->schema([
                             TextEntry::make('purchased_in')
                                 ->hiddenLabel()
                                 ->state(fn ($record) => $record->purchased_city ? $record->purchased_city.", ".$record->purchasedCountry->name : $record->purchasedCountry->name)
@@ -54,8 +59,8 @@ class BookInfolist
                             TextEntry::make('purchased_date')
                                 ->hiddenLabel()
                                 ->date('j. n. Y.'),
-                        ])->columnSpan(4),
-                        Grid::make(1)->schema([
+                        ])->columnSpan(3),
+                        //Grid::make(1)->schema([
                             Section::make('Is read')->schema([
                                 TextEntry::make('is_read')
                                     ->date(fn ($record) => $record->is_read ? ($record->read_date ? 'j. n. Y.' : '') : '')
@@ -63,13 +68,13 @@ class BookInfolist
                                     ->iconColor(fn ($record) => $record->is_read ? 'success' : 'danger')
                                     ->state(fn ($record) => $record->is_read ? ($record->read_date ?? '1999-06-30') : '1999-06-30')
                                     ->hiddenLabel(),
-                            ])->columnSpanFull(),
+                            ])->columnSpan(3),
                             Section::make('Meta')->schema([
                                 TextEntry::make('user.username')->label('Created by'),
                                 TextEntry::make('created_at')->dateTime(),
                                 TextEntry::make('updated_at')->dateTime(),
-                            ])->columnSpanFull()->collapsed(),
-                        ])->columnSpan(4),
+                            ])->columnSpan(3)->collapsed(),
+                        //])->columnSpan(4),
                     ])->columnSpanFull(),
                 ])->columnSpan(9),
             ])->columnSpanFull(),
