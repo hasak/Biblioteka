@@ -5,45 +5,92 @@
 
 namespace App\Services;
 
+use App\Models\Language;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class BookApi
 {
+    static int $timeout = 15;
     static function fromIsbn(string $isbn):?array{
-        return self::fromGoogleBooks($isbn)??self::fromOpenLibrary($isbn);
+        $google = self::fromGoogleBooks($isbn);
+        $open = self::fromOpenLibrary($isbn);
+        if(!$open && !$google)
+            return null;
+
+        $cover = self::getCoverFromLongitood($isbn) ?? ($open['cover'] ?? null) ?? ($google['cover'] ?? null);
+        if($cover)
+            self::saveCover($cover, $isbn);
+
+        $data = $google ?? $open;
+        $data['cover'] = $cover ? self::getCoverPath($isbn) : null;
+        return $data;
     }
-    static function fromOpenLibrary(string $isbn):?array{
-        $response=Http::get('https://openlibrary.org/api/books', [
+
+    private static function fromGoogleBooks(string $isbn):?array{
+        $response=Http::timeout(self::$timeout)->get('https://www.googleapis.com/books/v1/volumes', [
+            'q'=>'isbn:'.$isbn,
+        ]);
+        if(!$response->successful())
+            return null;
+        $data=$response->json('items.0.volumeInfo');
+        if(!$data)
+            return null;
+
+        return [
+            'cover' => $data['imageLinks']['thumbnail'] ?? $data['imageLinks']['smallThumbnail'] ?? null,
+            'title' => $data['title'] ?? null,
+            'author' => collect($data['authors'] ?? [])->implode(', '),
+            'publisher' => $data['publisher'] ?? null,
+            'year' => preg_match('/\d{4}/', $data['publishedDate'] ?? '', $m) ? (int) $m[0] : null,
+            'language_id' => isset($data['language']) ? Language::where('code',substr(strtolower($data['language']),0,2))->value('id') : null,
+            'isbn' => $isbn,
+        ];
+    }
+    private static function fromOpenLibrary(string $isbn):?array{
+        $response=Http::timeout(self::$timeout)->get('https://openlibrary.org/api/books', [
             'bibkeys'=>'ISBN:'.$isbn,
             'format'=>'json',
             'jscmd'=>'data',
         ]);
+        if(!$response->successful())
+            return null;
         $data=$response->json()['ISBN:'.$isbn]??null;
         if(!$data)
             return null;
+
         return [
+            'cover' => $data['cover']['large'] ?? $data['cover']['medium'] ?? $data['cover']['small'] ?? null,
             'title' => $data['title'] ?? null,
-            'author' => $data['authors'][0]['name'] ?? null,
-            'year' => $data['publish_date'] ?? null,
+            'author' => collect($data['authors'] ?? [])
+                ->pluck('name')
+                ->implode(', '),
             'publisher' => $data['publishers'][0]['name'] ?? null,
+            'year' => preg_match('/\d{4}/', $data['publish_date'] ?? '', $m) ? (int) $m[0] : null,
             'isbn' => $isbn,
         ];
     }
 
-    private static function fromGoogleBooks(string $isbn){
-        $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
-            'q'=>'isbn:'.$isbn,
-        ]);
-        $item = $response->json('items.0.volumeInfo');
-        if (!$item)
+    private static function getCoverFromLongitood(string $isbn):?string{
+        $response=Http::timeout(self::$timeout)->get("https://bookcover.longitood.com/bookcover/".$isbn);
+        if(!$response->successful())
             return null;
-        return [
-            'title' => $item['title'] ?? null,
-            'author' => $item['authors'][0] ?? null,
-            'publisher' => $item['publisher'] ?? null,
-            'year' => substr($item['publishedDate'] ?? '', 0, 4),
-            'isbn' => $isbn,
-            'language' => $item['language'] ?? null,
-        ];
+        return $response->json()['url'] ?? null;
+    }
+
+    private static function saveCover(string $link, string $isbn):bool{
+        if(!$link || !$isbn)
+            return false;
+        $response=Http::timeout(self::$timeout)->get($link);
+        if(!$response->successful())
+            return false;
+        $cover=$response->body();
+        $path=self::getCoverPath($isbn);
+        Storage::disk('public')->put($path, $cover);
+        return true;
+    }
+
+    private static function getCoverPath(string $isbn):string{
+        return "books/covers/{$isbn}.jpg";
     }
 }

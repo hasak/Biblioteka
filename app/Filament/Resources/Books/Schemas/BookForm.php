@@ -8,6 +8,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
+use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -16,6 +17,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class BookForm
 {
@@ -29,7 +31,17 @@ class BookForm
                     ->directory('books/covers')
                     ->disk('public')
                     ->maxSize(2048)
-                    ->imagePreviewHeight('744px')
+                    ->imagePreviewHeight('745px')
+                    ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, callable $get){
+                        $isbn=$get('isbn');
+                        if(!$isbn){
+                            return $file->store('books/covers', 'public');
+                        }
+                        $path = "books/covers/{$isbn}.jpg";
+                        Storage::disk('public')->put($path, file_get_contents($file->getRealPath()));
+                        return $path;
+                    })
+                    ->live()
                     ->columnSpan(3)
                     ->openable()
                     ->downloadable()
