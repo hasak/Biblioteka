@@ -16,14 +16,12 @@ class SeriesSeeder extends Seeder
         $series = Series::firstOrCreate([
             'title' => 'Harry Potter',
             'author' => 'J.K. Rowling',
-            'genre_id' => 1,
             'is_completed' => true,
             'user_id' => 1
         ]);
         $series = Series::firstOrCreate([
             'title' => 'Back to the Future',
             'author' => 'Spielberg',
-            'genre_id' => 2,
             'is_completed' => false,
             'user_id' => 1
         ]);

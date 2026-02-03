@@ -36,18 +36,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
 
-            $table->unique(['series_id', 'part_number']);
+            //$table->unique(['series_id', 'part_number']);
         });
-
-        DB::statement("
-            ALTER TABLE books
-            ADD CONSTRAINT chk_books_series_part
-            CHECK (
-                (series_id IS NULL AND part_number IS NULL)
-                OR
-                (series_id IS NOT NULL AND part_number IS NOT NULL)
-            )
-        ");
     }
 
     /**

@@ -18,7 +18,6 @@ class SeriesInfolist
             Section::make('Basic information')->schema([
                 Grid::make(2)->schema([
                     TextEntry::make('title')->size(TextSize::Large)->weight(FontWeight::Bold),
-                    TextEntry::make('genre.name')->label('Genre'),
                     TextEntry::make('author'),
                     IconEntry::make('is_completed')->boolean(),
                 ]),
@@ -29,23 +28,5 @@ class SeriesInfolist
                 TextEntry::make('updated_at')->dateTime(),
             ])->collapsed(),
         ]);
-        /*
-        return $schema
-            ->components([
-                TextEntry::make('title'),
-                TextEntry::make('author'),
-                TextEntry::make('genre.name')
-                    ->label('Genre'),
-                //TextEntry::make('position'),
-                IconEntry::make('is_completed')
-                    ->boolean(),
-                TextEntry::make('user.username')
-                    ->label('Added by'),
-                TextEntry::make('created_at')
-                    ->dateTime(),
-                TextEntry::make('updated_at')
-                    ->dateTime(),
-            ]);
-        */
     }
 }

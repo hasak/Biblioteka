@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Series\Schemas;
 
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -17,9 +16,6 @@ class SeriesForm
                     ->required(),
                 TextInput::make('author')
                     ->required(),
-                Select::make('genre.name')
-                    ->relationship('genre', 'name'),
-                //TextInput::make('position'),
                 Toggle::make('is_completed'),
             ]);
     }
