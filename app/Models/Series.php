@@ -4,21 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Genre was deliberately dropped from Series — books carry their own.
+ */
 class Series extends Model
 {
     protected $fillable=[
         'title',
         'author',
-        'genre_id',
         'is_completed',
         'user_id',
     ];
+
+    protected function casts(): array{
+        return [
+            'is_completed' => 'boolean',
+        ];
+    }
     function user(){
         return $this->belongsTo(User::class);
-    }
-
-    function genre(){
-        return $this->belongsTo(Genre::class);
     }
 
     function books(){
