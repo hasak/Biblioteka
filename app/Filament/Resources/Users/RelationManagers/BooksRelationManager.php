@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use Filament\Tables\Columns\TextColumn;
-use App\Filament\Resources\Users\UserResource;
-use Filament\Actions\CreateAction;
 use App\Filament\Resources\Books\BookResource;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
