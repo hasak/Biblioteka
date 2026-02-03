@@ -4,8 +4,6 @@ namespace App\Filament\Resources\Genres\RelationManagers;
 
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Resources\Books\BookResource;
-use App\Filament\Resources\Genres\GenreResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 

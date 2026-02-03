@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
-use Filament\Support\Enums\TextSize;
 use Filament\Support\Icons\Heroicon;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\FontWeight;
-use Illuminate\Support\Facades\Storage;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
