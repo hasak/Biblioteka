@@ -84,16 +84,16 @@ class BookForm
                                     ->icon(Heroicon::OutlinedBarsArrowDown)
                                     ->tooltip('Fetch book data from ISBN')
                                     ->disabled(fn (Get $get) => blank($get('isbn')))
-                                    ->action(function (Get $get, Set $set){
+                                    ->action(function (Get $get, Set $set, $livewire){
                                         $success=0;
                                         if(self::fillFromIsbn($get, $set))
                                             $success+=1;
-
+                                        /*
                                         if($cover = BookApi::fetchCover($get('isbn'))){
                                             $set('cover', $cover);
                                             $success+=2;
-                                        }
-
+                                        }*/
+                                        $livewire->dispatch('lwfetchcover',$get('isbn'));
                                         switch($success){
                                             case 0:
                                                 Notification::make()
