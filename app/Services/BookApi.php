@@ -35,18 +35,7 @@ class BookApi
         return self::COVER_EXTENSIONS[$mime] ?? null;
     }
     static function fromIsbn(string $isbn):?array{
-        $google = self::fromGoogleBooks($isbn);
-        $open = self::fromOpenLibrary($isbn);
-        if(!$open && !$google)
-            return null;
-
-        $cover = self::getCoverFromLongitood($isbn) ?? ($open['cover'] ?? null) ?? ($google['cover'] ?? null);
-        if($cover)
-            self::saveCover($cover, $isbn);
-
-        $data = $google ?? $open;
-        $data['cover'] = $cover ? self::getCoverPath($isbn) : null;
-        return $data;
+        return self::fromGoogleBooks($isbn) ?? self::fromOpenLibrary($isbn) ?? null;
     }
 
     private static function fromGoogleBooks(string $isbn):?array{
@@ -60,7 +49,6 @@ class BookApi
             return null;
 
         return [
-            'cover' => $data['imageLinks']['thumbnail'] ?? $data['imageLinks']['smallThumbnail'] ?? null,
             'title' => $data['title'] ?? null,
             'author' => collect($data['authors'] ?? [])->implode(', '),
             'publisher' => $data['publisher'] ?? null,
@@ -69,6 +57,7 @@ class BookApi
             'isbn' => $isbn,
         ];
     }
+
     private static function fromOpenLibrary(string $isbn):?array{
         $response=Http::timeout(self::$timeout)->get('https://openlibrary.org/api/books', [
             'bibkeys'=>'ISBN:'.$isbn,
@@ -82,7 +71,6 @@ class BookApi
             return null;
 
         return [
-            'cover' => $data['cover']['large'] ?? $data['cover']['medium'] ?? $data['cover']['small'] ?? null,
             'title' => $data['title'] ?? null,
             'author' => collect($data['authors'] ?? [])
                 ->pluck('name')
@@ -93,26 +81,27 @@ class BookApi
         ];
     }
 
-    private static function getCoverFromLongitood(string $isbn):?string{
+    static function fetchCover(string $isbn):?string{
+        if(!$isbn)
+            return null;
         $response=Http::timeout(self::$timeout)->get("https://bookcover.longitood.com/bookcover/".$isbn);
         if(!$response->successful())
             return null;
-        return $response->json()['url'] ?? null;
-    }
-
-    private static function saveCover(string $link, string $isbn):bool{
-        if(!$link || !$isbn)
-            return false;
-        $response=Http::timeout(self::$timeout)->get($link);
+        $url = $response->json('url');
+        // The URL comes from a third party, so only follow plain https links.
+        if(!$url || !filter_var($url, FILTER_VALIDATE_URL) || !str_starts_with($url, 'https://'))
+            return null;
+        $response=Http::timeout(self::$timeout)->get($url);
         if(!$response->successful())
-            return false;
+            return null;
+        $extension=self::coverExtension($response->header('Content-Type'));
+        if(!$extension)
+            return null;
         $cover=$response->body();
-        $path=self::getCoverPath($isbn);
+        if(strlen($cover) > self::$maxCoverBytes)
+            return null;
+        $path="books/covers/{$isbn}.{$extension}";
         Storage::disk('public')->put($path, $cover);
-        return true;
-    }
-
-    private static function getCoverPath(string $isbn):string{
-        return "books/covers/{$isbn}.jpg";
+        return $path;
     }
 }
