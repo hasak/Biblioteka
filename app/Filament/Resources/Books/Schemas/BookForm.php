@@ -85,7 +85,35 @@ class BookForm
                                     ->tooltip('Fetch book data from ISBN')
                                     ->disabled(fn (Get $get) => blank($get('isbn')))
                                     ->action(function (Get $get, Set $set){
-                                        self::fillFromIsbn($get, $set);
+                                        $success=0;
+                                        if(self::fillFromIsbn($get, $set))
+                                            $success+=1;
+
+                                        if($cover = BookApi::fetchCover($get('isbn'))){
+                                            $set('cover', $cover);
+                                            $success+=2;
+                                        }
+
+                                        switch($success){
+                                            case 0:
+                                                Notification::make()
+                                                    ->title('Error loading Book data and Cover')
+                                                    ->danger()
+                                                    ->send();
+                                                break;
+                                            case 1:
+                                                Notification::make()
+                                                    ->title('Book data fetched but Cover not found')
+                                                    ->warning()
+                                                    ->send();
+                                                break;
+                                            case 2:
+                                                Notification::make()
+                                                    ->title('Book data and Cover successfully loaded')
+                                                    ->success()
+                                                    ->send();
+                                                break;
+                                        }
                                     })
                             ),
                         ]),
@@ -114,26 +142,20 @@ class BookForm
         ]);
     }
 
-    private static function fillFromIsbn(Get $get, Set $set):void{
+    private static function fillFromIsbn(Get $get, Set $set):bool{
         $isbn = $get('isbn');
         if(!$isbn)
-            return;
+            return false;
         $data = BookApi::fromIsbn($isbn);
-        if(!$data){
-            Notification::make()
-                ->title('Book not found')
-                ->danger()
-                ->send();
-            return;
-        }
-        foreach($data as $field=>$value) {
-            if($value && !$get($field)) {
-                $set($field,$value);
+        if($data){
+            foreach($data as $field=>$value) {
+                if($value && !$get($field)) {
+                    $set($field,$value);
+                }
             }
+            return true;
+        }else{
+            return false;
         }
-        Notification::make()
-            ->title('Book data loaded')
-            ->success()
-            ->send();
     }
 }
