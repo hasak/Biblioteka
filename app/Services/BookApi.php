@@ -35,6 +35,9 @@ class BookApi
         return self::COVER_EXTENSIONS[$mime] ?? null;
     }
     static function fromIsbn(string $isbn):?array{
+        $isbn = str_replace('-', '', $isbn);
+        if(!$isbn || (strlen($isbn) !== 10 && strlen($isbn) !== 13))
+            return null;
         return self::fromGoogleBooks($isbn) ?? self::fromOpenLibrary($isbn) ?? null;
     }
 
