@@ -44,6 +44,7 @@ class BookApi
     private static function fromGoogleBooks(string $isbn):?array{
         $response=Http::timeout(self::$timeout)->get('https://www.googleapis.com/books/v1/volumes', [
             'q'=>'isbn:'.$isbn,
+            'key'=>config('app.google_books_api_key'),
         ]);
         if(!$response->successful())
             return null;

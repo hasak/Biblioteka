@@ -123,4 +123,14 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Custom
+    |--------------------------------------------------------------------------
+    |
+    | Custom configuration options
+    |
+    */
+
+    'google_books_api_key' => env('GOOGLE_BOOKS_API_KEY'),
 ];
