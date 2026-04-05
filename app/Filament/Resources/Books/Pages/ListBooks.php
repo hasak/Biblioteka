@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Books\Pages;
 
+use Filament\Actions\Action;
 use App\Filament\Resources\Books\BookResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -13,6 +14,9 @@ class ListBooks extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('scan')
+                ->label('Scan')
+                ->url(route('filament.admin.pages.scan')),
             CreateAction::make(),
         ];
     }
