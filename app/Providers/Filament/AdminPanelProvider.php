@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\RedirectToLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(false)
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ])
 
             ->authMiddleware([
-                Authenticate::class,
+                RedirectToLogin::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -55,7 +55,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                'admin.only',
             ])
             ->maxContentWidth('full');
     }
