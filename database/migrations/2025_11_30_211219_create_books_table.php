@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('author');
             $table->foreignId('series_id')->nullable()->constrained();
-            $table->unsignedTinyInteger('part_number')->nullable();
+            $table->double('part_number')->nullable();
             $table->string('publisher');
             $table->unsignedInteger('year');
             $table->foreignId('country_id')->constrained();
