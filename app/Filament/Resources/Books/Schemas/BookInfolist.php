@@ -46,7 +46,7 @@ class BookInfolist
                         ]),
                     ]),
                     Grid::make(12)->schema([
-                        Section::make('Shelf position')->schema([
+                        Section::make(fn($record) => 'Shelf position ('.$record->shelf_x.','.$record->shelf_y.')')->schema([
                             ShelfPositionEntry::make('shelf_position')->hiddenLabel(),
                         ])->columnSpan(3),
                         Section::make('Obtained')->schema([

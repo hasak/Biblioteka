@@ -17,6 +17,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use App\Filament\Forms\Components\ShelfPositionInput;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class BookForm
@@ -93,8 +94,11 @@ class BookForm
                     ]),
                     Grid::make(12)->schema([
                         Section::make('Shelf position')->schema([
-                            TextInput::make('shelf_x')->label('X')->numeric()->required(),
-                            TextInput::make('shelf_y')->label('Y')->numeric()->required(),
+                            ShelfPositionInput::make('position')->hiddenLabel(),
+                            Grid::make(['default' => 2])->schema([
+                                TextInput::make('shelf_x')->label('X')->numeric()->minValue(1)->maxValue(6)->required(),
+                                TextInput::make('shelf_y')->label('Y')->numeric()->minValue(1)->maxValue(6)->required(),
+                            ]),
                         ])->columnSpan(4),
                         Section::make('Obtained')->schema([
                             TextInput::make('purchased_city')->label('City'),
