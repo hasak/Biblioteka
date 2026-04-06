@@ -75,4 +75,19 @@ class CreateBook extends CreateRecord
             ->success()
             ->send();
     }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+            \Filament\Actions\Action::make('createAndScan')
+                ->label('Create & scan another')
+                ->action(function () {
+                    $this->create();
+                    $this->redirect(route('filament.admin.pages.scan'));
+                }),
+            ...($this->canCreateAnother() ? [$this->getCreateAnotherFormAction()->color('primary')] : []),
+            $this->getCancelFormAction(),
+        ];
+    }
 }
