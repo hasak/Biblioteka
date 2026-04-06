@@ -53,7 +53,7 @@
 
     <script>
         (function(){
-            const BASE_URL = 'http://localhost:8000/admin/books/create/';
+            const BASE_URL = '{{config('app.url')}}/admin/books/create/';
             let scanning = false, lastCode = null, debounceTimer = null;
 
             function setStatus(msg){ document.getElementById('isbn-status').textContent = msg }
