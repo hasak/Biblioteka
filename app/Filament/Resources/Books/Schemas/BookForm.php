@@ -31,7 +31,7 @@ class BookForm
                     ->hiddenLabel()
                     ->directory('books/covers')
                     ->disk('public')
-                    ->maxSize(2048)
+                    ->maxSize(16384)
                     ->imagePreviewHeight('745px')
                     ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, callable $get){
                         $isbn=$get('isbn');
