@@ -38,8 +38,13 @@ class BookInfolist
                         ]),
                         Grid::make(3)->schema([
                             TextEntry::make('genre.name')->label('Genre'),
-                            TextEntry::make('language.name')->label('Language'),
-                            TextEntry::make('country.name')->label('Publishing country'),
+                            TextEntry::make('language.name')
+                                ->label('Language')
+                                ->formatStateUsing(fn ($record) => $record->language?->withBadge())
+                                ->html(),
+                            TextEntry::make('country.name')
+                                ->label('Publishing country')
+                                ->formatStateUsing(fn ($record) => $record->country?->withFlag()),
                         ]),
                         Grid::make(3)->schema([
                             TextEntry::make('publisher'),
@@ -54,7 +59,21 @@ class BookInfolist
                         Section::make('Obtained')->schema([
                             TextEntry::make('purchased_in')
                                 ->hiddenLabel()
-                                ->state(fn ($record) => $record->purchased_city ? $record->purchased_city.", ".$record->purchasedCountry->name : $record->purchasedCountry->name)
+                                ->state(function ($record) {
+                                    $ret = "";
+                                    if($record->purchased_city){
+                                        $ret .= $record->purchased_city;
+                                        if($record->purchased_city === 'Tesanj' || $record->purchased_city === 'Tešanj'){
+                                            $ret .= ' <img src="'.asset('images/tesanj.png').'" style="height:1em;vertical-align:center;display:inline" />';
+                                        }
+                                        $ret .=', ';
+                                    }
+                                    $ret .= $record->purchasedCountry->name;
+                                    $ret .= ' ';
+                                    $ret .= countryCodeToFlag($record->purchasedCountry?->code);
+                                    return $ret;
+                                })
+                                ->html()
                                 ->visible(fn ($record) => $record->purchasedCountry != null),
                             TextEntry::make('purchased_date')
                                 ->hiddenLabel()
