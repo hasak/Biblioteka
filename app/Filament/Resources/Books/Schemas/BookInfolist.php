@@ -27,7 +27,7 @@ class BookInfolist
                     ->extraImgAttributes(['style' => "border-radius: 0.75rem;"]),
                 Grid::make(1)->schema([
                     Section::make()->schema([
-                        TextEntry::make('title')->hiddenLabel()->weight(FontWeight::Bold)->extraAttributes(['style' => 'font-size: 2rem;']),
+                        TextEntry::make('title')->hiddenLabel()->extraAttributes(['style' => 'font-size: 2.5rem;']),
                         TextEntry::make('author'),
                         Grid::make(3)->schema([
                             TextEntry::make('series.title')->label('Series')->visible(fn ($record) => $record->series != null),

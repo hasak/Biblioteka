@@ -56,6 +56,21 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->maxContentWidth('full');
+            ->maxContentWidth('full')
+            ->renderHook('panels::head.end', fn() => '
+                <style>
+                    .fi-in-entry-label {
+                        font-size: 0.65rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        color: var(--gray-400);
+                    }
+                    .fi-in-text {
+                        font-size: 1.1rem;
+                        font-weight: 300;
+                    }
+                </style>
+            ');
     }
 }

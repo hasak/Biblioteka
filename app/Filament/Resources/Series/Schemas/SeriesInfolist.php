@@ -17,7 +17,7 @@ class SeriesInfolist
         return $schema->schema([
             Section::make('Basic information')->schema([
                 Grid::make(2)->schema([
-                    TextEntry::make('title')->size(TextSize::Large)->weight(FontWeight::Bold),
+                    TextEntry::make('title')->extraAttributes(['style' => 'font-size: 1.5rem;']),
                     TextEntry::make('author'),
                     IconEntry::make('is_completed')->boolean(),
                 ]),
