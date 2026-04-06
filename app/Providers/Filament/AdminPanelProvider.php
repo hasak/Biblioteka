@@ -57,6 +57,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->maxContentWidth('full')
+            ->favicon(asset('images/favicon.svg'))
             ->renderHook('panels::head.end', fn() => '
                 <style>
                     .fi-in-entry-label {
