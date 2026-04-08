@@ -34,21 +34,21 @@ class BookInfolist
                         Grid::make(3)->schema([
                             TextEntry::make('series.title')->label('Series')->visible(fn ($record) => $record->series != null),
                             TextEntry::make('part_number')->label('Part')->visible(fn ($record) => $record->part_number != null || $record->series != null),
-                            TextEntry::make('year'),
-                        ]),
+                            TextEntry::make('original_title')->visible(fn ($record) => $record->original_title != null),
+                        ])->visible(fn ($record) => $record->series != null || $record->part_number != null || $record->original_title != null),
                         Grid::make(3)->schema([
                             TextEntry::make('genre.name')->label('Genre'),
                             TextEntry::make('language.name')
                                 ->label('Language')
                                 ->formatStateUsing(fn ($record) => $record->language?->withBadge())
                                 ->html(),
-                            TextEntry::make('country.name')
-                                ->label('Publishing country')
-                                ->formatStateUsing(fn ($record) => $record->country?->withFlag()),
+                            TextEntry::make('year'),
                         ]),
                         Grid::make(3)->schema([
                             TextEntry::make('publisher'),
-                            TextEntry::make('original_title'),
+                            TextEntry::make('country.name')
+                                ->label('Publishing country')
+                                ->formatStateUsing(fn ($record) => $record->country?->withFlag()),
                             TextEntry::make('isbn')->label('ISBN')->copyable(),
                         ]),
                     ]),
