@@ -71,6 +71,9 @@ class AdminPanelProvider extends PanelProvider
                         font-size: 1.1rem;
                         font-weight: 300;
                     }
+                    .fi-header-heading{
+                        display: none;
+                    }
                 </style>
             ');
     }
