@@ -32,22 +32,22 @@ class BookInfolist
                         Grid::make(3)->schema([
                             TextEntry::make('series.title')->label('Series')->visible(fn ($record) => $record->series != null),
                             TextEntry::make('part_number')->label('Part')->visible(fn ($record) => $record->part_number != null || $record->series != null),
-                            TextEntry::make('year'),
-                        ]),
+                            TextEntry::make('original_title')->visible(fn ($record) => $record->original_title != null),
+                        ])->visible(fn ($record) => $record->series != null || $record->part_number != null || $record->original_title != null),
                         Grid::make(3)->schema([
                             TextEntry::make('genre.name')->label('Genre'),
                             TextEntry::make('language.name')
                                 ->label('Language')
                                 ->formatStateUsing(fn ($state, $record) => $state . ' <span style="position: relative;top: -1px;" class="fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">' . $record->language?->code . '</span>')
                                 ->html(),
+                            TextEntry::make('year'),
+                        ]),
+                        Grid::make(3)->schema([
+                            TextEntry::make('publisher'),
                             TextEntry::make('country.name')
                                 ->label('Publishing country')
                                 ->formatStateUsing(fn ($state, $record) => $state . ' ' . countryCodeToFlag($record->country?->code))
                                 ->html(),
-                        ]),
-                        Grid::make(3)->schema([
-                            TextEntry::make('publisher'),
-                            TextEntry::make('original_title'),
                             TextEntry::make('isbn')->label('ISBN')->copyable(),
                         ]),
                     ]),

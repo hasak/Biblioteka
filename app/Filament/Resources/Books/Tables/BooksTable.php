@@ -77,7 +77,8 @@ class BooksTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime('j. n. Y. @ G:i')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->dateTime('j. n. Y. @ G:i')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -93,6 +94,7 @@ class BooksTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }
