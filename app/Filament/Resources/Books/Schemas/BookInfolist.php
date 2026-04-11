@@ -57,23 +57,16 @@ class BookInfolist
                             ShelfPositionEntry::make('shelf_position')->hiddenLabel(),
                         ])->columnSpan(3),
                         Section::make('Obtained')->schema([
+                            // Uses the Book::purchasedIn accessor, which joins city and
+                            // country and is null-safe on its own.
+                            /*
+                            Easter egg, once upon a time:
+                            if($record->purchased_city === 'Tesanj' || $record->purchased_city === 'Tešanj'){
+                                $ret .= ' <img src="'.asset('images/tesanj.png').'" style="height:1em;vertical-align:center;display:inline" />';
+                            }
+                            */
                             TextEntry::make('purchased_in')
                                 ->hiddenLabel()
-                                ->state(function ($record) {
-                                    $ret = "";
-                                    if($record->purchased_city){
-                                        $ret .= $record->purchased_city;
-                                        if($record->purchased_city === 'Tesanj' || $record->purchased_city === 'Tešanj'){
-                                            $ret .= ' <img src="'.asset('images/tesanj.png').'" style="height:1em;vertical-align:center;display:inline" />';
-                                        }
-                                        $ret .=', ';
-                                    }
-                                    $ret .= $record->purchasedCountry->name;
-                                    $ret .= ' ';
-                                    $ret .= countryCodeToFlag($record->purchasedCountry?->code);
-                                    return $ret;
-                                })
-                                ->html()
                                 ->visible(fn ($record) => $record->purchasedCountry != null),
                             TextEntry::make('purchased_date')
                                 ->hiddenLabel()
