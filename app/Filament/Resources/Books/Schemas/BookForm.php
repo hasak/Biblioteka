@@ -96,7 +96,7 @@ class BookForm
                                         self::fillFromIsbn($get, $set);
                                         $livewire->dispatch('lwfetchcover',$get('isbn'));
                                     })
-                            ),
+                            )->dehydrateStateUsing(fn ($state) => str_replace('-', '', $state)),
                         ]),
                     ]),
                     Grid::make(12)->schema([
