@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Tables\Table;
 use App\Http\Middleware\RedirectToLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -75,6 +76,12 @@ class AdminPanelProvider extends PanelProvider
                         display: none;
                     }
                 </style>
-            ');
+            ')
+            ->bootUsing(function () {
+                Table::configureUsing(fn (Table $table) => $table
+                    ->paginated([25, 50, 100, 200])
+                    ->defaultPaginationPageOption(200)
+                );
+            });
     }
 }

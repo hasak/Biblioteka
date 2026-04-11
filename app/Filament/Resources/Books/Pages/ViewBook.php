@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Books\Pages;
 
 use App\Models\Book;
 use Filament\Actions\Action;
+use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Books\BookResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -11,6 +12,10 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewBook extends ViewRecord
 {
     protected static string $resource = BookResource::class;
+
+    public function getTitle():string|Htmlable{
+        return $this->getRecord()->title;
+    }
 
     protected function getHeaderActions(): array
     {
