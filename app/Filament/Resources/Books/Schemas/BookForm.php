@@ -58,28 +58,32 @@ class BookForm
                                     TextInput::make('author')->label("Series' Author")->required(),
                                     Toggle::make('is_completed')->label('Completed'),
                             ]),
-                            TextInput::make('part_number')->numeric(),
-                            TextInput::make('year')->numeric()->required(),
+                            TextInput::make('part_number')->label('Part')->numeric()->extraInputAttributes([
+                                'type' => 'text',
+                                'inputmode' => 'decimal',
+                                'oninput' => "this.value = this.value.replace(',', '.')"
+                            ]),
+                            TextInput::make('original_title'),
                         ]),
                         Grid::make(3)->schema([
-                            Select::make('genre_id')->relationship('genre', 'name')->preload()->searchable()->required()
+                            Select::make('genre_id')->relationship('genre', 'name')->preload()->required()
                                 ->createOptionForm([
                                     TextInput::make('name')->label("Genre")->required()->unique('genres', 'name'),
                             ]),
-                            Select::make('language_id')->relationship('language', 'name')->preload()->searchable()->required()
+                            Select::make('language_id')->relationship('language', 'name')->preload()->required()
                                 ->createOptionForm([
                                     TextInput::make('name')->label("Language")->required()->unique('languages', 'name'),
                                     TextInput::make('code')->label("Code")->required()->unique('languages', 'code'),
                                 ]),
-                            Select::make('country_id')->relationship('country', 'name')->label('Publishing country')->preload()->searchable()->required()
+                            TextInput::make('year')->numeric()->required(),
+                        ]),
+                        Grid::make(3)->schema([
+                            TextInput::make('publisher')->required(),
+                            Select::make('country_id')->relationship('country', 'name')->label('Publishing country')->preload()->required()
                                 ->createOptionForm([
                                     TextInput::make('name')->label("Country")->required()->unique('countries', 'name'),
                                     TextInput::make('code')->label("Code")->required()->unique('countries', 'code'),
                                 ]),
-                        ]),
-                        Grid::make(3)->schema([
-                            TextInput::make('publisher')->required(),
-                            TextInput::make('original_title'),
                             TextInput::make('isbn')->label('ISBN')->live()->required()
                                 ->unique(ignoreRecord: true)
                                 // Strip dashes as they are typed so the validated
@@ -109,7 +113,7 @@ class BookForm
                         ])->columnSpan(4),
                         Section::make('Obtained')->schema([
                             TextInput::make('purchased_city')->label('City'),
-                            Select::make('purchased_country_id')->relationship('purchasedCountry', 'name')->label('Country')->preload()->searchable()
+                            Select::make('purchased_country_id')->relationship('purchasedCountry', 'name')->label('Country')->preload()
                                 ->createOptionForm([
                                     TextInput::make('name')->label("Country")->required()->unique('countries', 'name'),
                                     TextInput::make('code')->label("Code")->required()->unique('countries', 'code'),
