@@ -62,9 +62,11 @@ class BookInfolist
                                     $ret = "";
                                     if($record->purchased_city){
                                         $ret .= $record->purchased_city;
+                                        /*
                                         if($record->purchased_city === 'Tesanj' || $record->purchased_city === 'Tešanj'){
                                             $ret .= ' <img src="'.asset('images/tesanj.png').'" style="height:1em;vertical-align:center;display:inline" />';
                                         }
+                                        */
                                         $ret .=', ';
                                     }
                                     $ret .= $record->purchasedCountry->name;

@@ -16,20 +16,12 @@ class SeriesTable
     {
         return $table
             ->columns([
-                TextColumn::make('part_number')
-                    ->label('Part')
-                    ->width('1%')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('genre.name')
-                    ->toggleable(),
-                TextColumn::make('position')
-                    ->toggleable()
-                    ->badge()
-                    ->color('gray'),
+                TextColumn::make('author')
+                    ->searchable()
+                    ->sortable(),
                 IconColumn::make('is_completed')
                     ->boolean()
                     ->sortable()

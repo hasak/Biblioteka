@@ -34,6 +34,7 @@ class BooksTable
                     ->toggleable(),
                 TextColumn::make('part_number')
                     ->label('Part')
+                    ->width('1%')
                     ->numeric()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('publisher')
