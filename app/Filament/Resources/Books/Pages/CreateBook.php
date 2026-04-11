@@ -19,11 +19,11 @@ class CreateBook extends CreateRecord
         if(!$isbn)
             return;
 
-        $data = BookApi::fromIsbn($isbn);
-        if ($data) {
-            $data['isbn'] = $isbn;
-            $this->form->fill($data);
+        $data = BookApi::fromIsbn($isbn) ?? [];
+        $data['isbn'] = $isbn;
+        $this->form->fill($data);
 
+        if(count($data) > 1) {
             Notification::make()
                 ->title('Book data loaded')
                 ->success()
