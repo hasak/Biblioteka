@@ -15,18 +15,20 @@ class SeriesInfolist
     public static function configure(Schema $schema): Schema
     {
         return $schema->schema([
-            Section::make('Basic information')->schema([
-                Grid::make(2)->schema([
-                    TextEntry::make('title')->extraAttributes(['style' => 'font-size: 1.5rem;']),
-                    TextEntry::make('author'),
-                    IconEntry::make('is_completed')->boolean(),
-                ]),
-            ]),
-            Section::make('Meta')->schema([
-                TextEntry::make('user.username')->label('Created by'),
-                TextEntry::make('created_at')->dateTime(),
-                TextEntry::make('updated_at')->dateTime(),
-            ])->collapsed(),
+            Grid::make(12)->schema([
+                Section::make('Basic information')->schema([
+                    Grid::make(2)->schema([
+                        TextEntry::make('title')->extraAttributes(['style' => 'font-size: 2rem;'])->columnSpanFull(),
+                        TextEntry::make('author'),
+                        IconEntry::make('is_completed')->boolean(),
+                    ]),
+                ])->columnSpan(9),
+                Section::make('Meta')->schema([
+                    TextEntry::make('user.username')->label('Created by'),
+                    TextEntry::make('created_at')->dateTime(),
+                    TextEntry::make('updated_at')->dateTime(),
+                ])->columnSpan(3)->collapsed()
+            ])->columnSpanFull()
         ]);
     }
 }
