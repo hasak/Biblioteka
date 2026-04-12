@@ -18,4 +18,9 @@ class Language extends Model
     function books(){
         return $this->hasMany(Book::class);
     }
+
+    /** Returns HTML, so both values are escaped before they are interpolated. */
+    function withBadge(){
+        return e($this->name).' <span style="position: relative;top: -1px;" class="fi-text-color-600 dark:fi-text-color-200 fi-badge fi-size-sm">'.e($this->code).'</span>';
+    }
 }

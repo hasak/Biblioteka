@@ -81,7 +81,7 @@ class Book extends Model
 
                 return collect([
                     $this->purchased_city,
-                    $this->purchasedCountry->name,
+                    $this->purchasedCountry->withFlag(),
                 ])->filter()->implode(', ');
             }
         );

@@ -23,4 +23,9 @@ class Country extends Model
     function purchasedBooks(){
         return $this->hasMany(Book::class, 'purchased_country_id');
     }
+
+    /** Plain text, not HTML — callers must not render this with ->html(). */
+    function withFlag(){
+        return $this->name.' '.countryCodeToFlag($this->code);
+    }
 }
