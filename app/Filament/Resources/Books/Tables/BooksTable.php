@@ -46,7 +46,9 @@ class BooksTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('language.name')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->formatStateUsing(fn ($state, $record) => $record->language?->withBadge())
+                    ->html(),
                 TextColumn::make('original_title')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

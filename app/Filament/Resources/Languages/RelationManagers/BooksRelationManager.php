@@ -15,20 +15,6 @@ class BooksRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('title')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('author')
-                    ->sortable(),
-                TextColumn::make('series.title')
-                    ->label('Series'),
-                TextColumn::make('genre.name')
-                    ->label('Genre'),
-                TextColumn::make('year')
-                    ->sortable(),
-            ])->defaultSort('title');
-
+        return BookResource::getBooksRelationTable($table);
     }
 }
