@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Book extends Model
 {
+    use SoftDeletes;
+
     /**
      * The "is read" column renders a date, so unread books still need a
      * parseable value to hand the formatter. It is never displayed — the
@@ -105,7 +107,9 @@ class Book extends Model
             }
         });
 
-        static::deleting(function (Book $book) {
+        // Only drop the file once the record is really gone — a soft-deleted
+        // book has to stay restorable, cover and all.
+        static::forceDeleted(function (Book $book) {
             if ($book->cover) {
                 Storage::disk('public')->delete($book->cover);
             }

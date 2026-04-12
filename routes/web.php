@@ -3,8 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+// The library is the app — send the root straight to it rather than
+// showing Laravel's default splash page.
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('filament.admin.pages.dashboard');
 });
 
 Route::get('/dashboard', function () {

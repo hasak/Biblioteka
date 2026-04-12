@@ -1,7 +1,7 @@
 <?php
 
-it('returns a successful response', function () {
+it('sends the root straight to the library', function () {
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response->assertRedirect(route('filament.admin.pages.dashboard'));
 });

@@ -11,6 +11,11 @@ use App\Models\Country;
 use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -103,7 +108,14 @@ class BooksTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('genre')->relationship('genre', 'name')->preload()->multiple(),
+                SelectFilter::make('language')->relationship('language', 'name')->preload()->multiple(),
+                SelectFilter::make('series')->relationship('series', 'title')->preload()->searchable()->multiple(),
+                SelectFilter::make('shelf_y')
+                    ->label('Shelf row')
+                    ->options(array_combine(range(1, 6), range(1, 6))),
+                TernaryFilter::make('is_read')->label('Read'),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -112,6 +124,8 @@ class BooksTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
