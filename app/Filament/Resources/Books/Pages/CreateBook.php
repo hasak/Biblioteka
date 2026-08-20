@@ -12,10 +12,9 @@ use App\Filament\Resources\Books\Schemas\BookForm;
 class CreateBook extends CreateRecord
 {
     protected static string $resource = BookResource::class;
-    public ?string $isbnForCover = null;
     public function mount(?string $isbn = null):void{
         parent::mount();
-        $isbn = str_replace('-', '', $isbn);
+        $isbn = str_replace('-', '', (string) $isbn);
         if(!$isbn)
             return;
 
@@ -35,7 +34,9 @@ class CreateBook extends CreateRecord
                 ->send();
         }
 
-        $this->isbnForCover = $isbn;
+        // Fetch the cover in a follow-up request instead of here, so the form
+        // is usable straight away while slow cover sources are still being tried.
+        $this->dispatch('lwfetchcover', isbn: $isbn);
     }
 
     protected function mutateFormDataBeforeCreate(array $data):array{
@@ -43,27 +44,17 @@ class CreateBook extends CreateRecord
         return $data;
     }
 
-    public function hydrate(): void
-    {
-        if ($this->isbnForCover) {
-            $cover = BookApi::fetchCover($this->isbnForCover);
-
-            if ($cover) {
-                $this->data['cover'] = [$cover];
-            }
-
-            $this->isbnForCover = null;
-        }
-    }
-
     #[On('lwfetchcover')]
     public function lwfetchcover($isbn){
         $cover = BookApi::fetchCover($isbn);
 
+        // A missing cover is not an error: everything else about the book is
+        // already filled in, and the user can still upload one by hand.
         if (!$cover) {
             Notification::make()
-                ->title('Error fetching cover')
-                ->danger()
+                ->title('No cover found')
+                ->body('Add one by hand if you have it.')
+                ->warning()
                 ->send();
             return;
         }

@@ -84,7 +84,10 @@ class BookForm
                                     TextInput::make('name')->label("Country")->required()->unique('countries', 'name'),
                                     TextInput::make('code')->label("Code")->required()->unique('countries', 'code'),
                                 ]),
-                            TextInput::make('isbn')->label('ISBN')->live()->required()
+                            // Debounced: without it every keystroke is its own
+                            // round trip, and a slow one landing late can undo
+                            // what has been typed since.
+                            TextInput::make('isbn')->label('ISBN')->live(debounce: '500ms')->required()
                                 ->unique(ignoreRecord: true)
                                 // Strip dashes as they are typed so the validated
                                 // value matches the dash-free value that gets stored.
