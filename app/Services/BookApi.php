@@ -15,11 +15,43 @@ class BookApi
 {
     static int $timeout = 15;
 
-    /** Covers are optional, so give up on them sooner than on the book data. */
-    static int $coverTimeout = 8;
+    /**
+     * Covers are optional, so give up on them sooner than on the book data.
+     * Open Library regularly takes more than 6s, so do not tighten this
+     * further — the progress panel exists so a slow source can be cancelled.
+     */
+    static int $coverTimeout = 9;
 
     /** Matches the 16 MB cap on the cover upload field. */
     static int $maxCoverBytes = 16777216;
+
+    /**
+     * Below this an image is a thumbnail rather than a cover — Google's
+     * default zoom=1 is 128px wide and unreadable on the page, while Open
+     * Library's usual 300-330px is small but perfectly usable. A narrower
+     * image is still kept if nothing better turns up.
+     */
+    static int $minCoverWidth = 300;
+
+    /** Too small to be a real cover at all; almost certainly a placeholder. */
+    static int $rejectCoverWidth = 100;
+
+    /**
+     * Cover sources in the order they are tried. The form walks these one
+     * request at a time so progress can be shown and the wait cancelled.
+     */
+    const COVER_SOURCES = [
+        'google' => 'Google Books',
+        'openlibrary' => 'Open Library',
+        'longitood' => 'Longitood',
+    ];
+
+    static function coverSources():array{
+        return collect(self::COVER_SOURCES)
+            ->map(fn ($label, $key) => ['key' => $key, 'label' => $label])
+            ->values()
+            ->all();
+    }
 
     /** Image types we are willing to store, and the extension each gets on disk. */
     const COVER_EXTENSIONS = [
@@ -112,63 +144,118 @@ class BookApi
     }
 
     /**
-     * Try each cover source in turn and keep the first image that downloads.
-     * Returns null when every source is dead — that is a missing cover, not
-     * an error, and the rest of the book data stands without it.
+     * Try every source in turn and keep the best cover found. Used from the
+     * console; the form calls fetchCoverFrom() one source at a time instead.
      */
     static function fetchCover(string $isbn):?string{
-        $isbn = str_replace('-', '', $isbn);
-        if(!$isbn)
-            return null;
+        $best = null;
 
-        foreach(self::coverUrls($isbn) as $url){
-            $path=self::downloadCover($isbn, $url);
-            if($path)
-                return $path;
+        foreach(array_keys(self::COVER_SOURCES) as $source){
+            $result = self::fetchCoverFrom($isbn, $source);
+            if($result && $result['width'] > ($best['width'] ?? 0))
+                $best = $result;
+            if($best && $best['width'] >= self::$minCoverWidth)
+                break;
         }
 
-        Log::info('No cover found for ISBN', ['isbn'=>$isbn]);
-        return null;
+        if(!$best)
+            Log::info('No cover found for ISBN', ['isbn'=>$isbn]);
+
+        return $best['path'] ?? null;
     }
 
     /**
-     * Cover sources, best first. A generator so a source that needs its own
-     * lookup request is only contacted once the ones before it have failed.
+     * Fetch the best cover one single source can offer.
+     *
+     * Returns null when the source has nothing, otherwise the stored path
+     * with the dimensions, so the caller can decide whether it is good
+     * enough to stop looking.
      */
-    private static function coverUrls(string $isbn):\Generator{
-        // Google Books — same response the book data already comes from.
-        if($url=self::googleCoverUrl($isbn))
-            yield $url;
-
-        // Open Library — default=false returns 404 rather than a blank placeholder.
-        yield "https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg?default=false";
-
-        // The original source, kept last: it has been unreachable but may return.
-        if($url=self::longitoodCoverUrl($isbn))
-            yield $url;
-    }
-
-    private static function googleCoverUrl(string $isbn):?string{
-        $links=self::googleVolumeInfo($isbn)['imageLinks'] ?? null;
-        if(!$links)
+    static function fetchCoverFrom(string $isbn, string $source):?array{
+        $isbn = str_replace('-', '', $isbn);
+        if(!$isbn || !isset(self::COVER_SOURCES[$source]))
             return null;
 
-        // Google lists these smallest last, so take the biggest one on offer.
-        foreach(['extraLarge','large','medium','thumbnail','smallThumbnail'] as $size){
-            if(!empty($links[$size]))
-                return str_replace('http://', 'https://', $links[$size]);
+        $best = null;
+
+        foreach(self::coverUrlsFrom($isbn, $source) as $url){
+            $candidate = self::downloadCover($url);
+            if(!$candidate)
+                continue;
+            if($candidate['width'] > ($best['width'] ?? 0))
+                $best = $candidate;
+            // The first size that is big enough wins; no point paying for the rest.
+            if($best['width'] >= self::$minCoverWidth)
+                break;
         }
-        return null;
+
+        if(!$best)
+            return null;
+
+        return [
+            'path' => self::storeCover($isbn, $best),
+            'width' => $best['width'],
+            'height' => $best['height'],
+            'bytes' => strlen($best['body']),
+            'source' => self::COVER_SOURCES[$source],
+        ];
+    }
+
+    /** Candidate URLs for one source, largest first. */
+    private static function coverUrlsFrom(string $isbn, string $source):array{
+        return match($source){
+            'google' => self::googleCoverUrls($isbn),
+            // default=false returns 404 rather than a blank placeholder.
+            'openlibrary' => ["https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg?default=false"],
+            'longitood' => array_filter([self::longitoodCoverUrl($isbn)]),
+            default => [],
+        };
+    }
+
+    /**
+     * Google serves one cover at several sizes, chosen by the zoom parameter.
+     * The URL it hands out uses zoom=1, which is a 128px thumbnail — useless
+     * on the page — while zoom=6 on the same volume is around 1280px.
+     */
+    private static function googleCoverUrls(string $isbn):array{
+        $links=self::googleVolumeInfo($isbn)['imageLinks'] ?? null;
+        if(!$links)
+            return [];
+
+        $base=null;
+        foreach(['extraLarge','large','medium','thumbnail','smallThumbnail'] as $size){
+            if(!empty($links[$size])){
+                $base=$links[$size];
+                break;
+            }
+        }
+        if(!$base)
+            return [];
+
+        $base=str_replace('http://', 'https://', $base);
+        // The curled-page-corner overlay is baked into the image; drop it.
+        $base=str_replace('&edge=curl', '', $base);
+
+        // Only two candidates: Google throttles a burst of image requests and
+        // starts 404ing them, so asking for every zoom level loses the cover
+        // entirely. Big one first, the original as the fallback.
+        $large=preg_match('/[?&]zoom=\d+/', $base)
+            ? preg_replace('/([?&]zoom=)\d+/', '${1}6', $base)
+            : $base.'&zoom=6';
+
+        return array_values(array_unique([$large, $base]));
     }
 
     private static function longitoodCoverUrl(string $isbn):?string{
-        $response=self::get("https://bookcover.longitood.com/bookcover/{$isbn}", [], self::$coverTimeout);
+        // Unreachable since at least Aug 2026, so it gets a short leash.
+        $response=self::get("https://bookcover.longitood.com/bookcover/{$isbn}", [], 3);
         $url=$response?->json('url');
 
         return is_string($url) ? $url : null;
     }
 
-    private static function downloadCover(string $isbn, string $url):?string{
+    /** Download one candidate and measure it. Null if it is not a usable image. */
+    private static function downloadCover(string $url):?array{
         // The URL comes from a third party, so only follow plain https links.
         if(!filter_var($url, FILTER_VALIDATE_URL) || !str_starts_with($url, 'https://'))
             return null;
@@ -178,11 +265,31 @@ class BookApi
         $extension=self::coverExtension($response->header('Content-Type'));
         if(!$extension)
             return null;
-        $cover=$response->body();
-        if($cover === '' || strlen($cover) > self::$maxCoverBytes)
+        $body=$response->body();
+        if($body === '' || strlen($body) > self::$maxCoverBytes)
             return null;
-        $path="books/covers/{$isbn}.{$extension}";
-        Storage::disk('public')->put($path, $cover);
+
+        $size=@getimagesizefromstring($body);
+        if(!$size || $size[0] < self::$rejectCoverWidth)
+            return null;
+
+        return ['body'=>$body, 'extension'=>$extension, 'width'=>$size[0], 'height'=>$size[1]];
+    }
+
+    private static function storeCover(string $isbn, array $cover):string{
+        $path="books/covers/{$isbn}.{$cover['extension']}";
+        $disk=Storage::disk('public');
+
+        // The same ISBN under a different extension would linger forever as an
+        // orphan, so clear the other spellings before writing this one.
+        foreach(self::COVER_EXTENSIONS as $extension){
+            $stale="books/covers/{$isbn}.{$extension}";
+            if($stale !== $path && $disk->exists($stale))
+                $disk->delete($stale);
+        }
+
+        $disk->put($path, $cover['body']);
+
         return $path;
     }
 }

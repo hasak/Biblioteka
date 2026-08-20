@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Utilities\Get;
@@ -46,7 +47,10 @@ class BookForm
                     ->columnSpan(3)
                     ->openable()
                     ->downloadable()
-                    ->nullable(),
+                    ->nullable()
+                    // Progress for the cover fetch, with a cancel button, so a
+                    // slow source can be abandoned in favour of a photo.
+                    ->belowContent(View::make('filament.forms.cover-status')),
                 Grid::make(1)->schema([
                     Section::make()->schema([
                         TextInput::make('title')->required(),
@@ -101,7 +105,8 @@ class BookForm
                                     ->disabled(fn (Get $get) => blank($get('isbn')))
                                     ->action(function (Get $get, Set $set, $livewire){
                                         self::fillFromIsbn($get, $set);
-                                        $livewire->dispatch('lwfetchcover',$get('isbn'));
+                                        // The browser takes it from here, one source at a time.
+                                        $livewire->dispatch('start-cover-fetch', isbn: str_replace('-', '', (string) $get('isbn')));
                                     })
                             )->dehydrateStateUsing(fn ($state) => str_replace('-', '', $state)),
                         ]),

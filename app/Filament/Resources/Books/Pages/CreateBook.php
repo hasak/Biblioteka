@@ -3,14 +3,16 @@
 namespace App\Filament\Resources\Books\Pages;
 
 use App\Services\BookApi;
-use Livewire\Attributes\On;
 use Filament\Notifications\Notification;
 use App\Filament\Resources\Books\BookResource;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\Books\Schemas\BookForm;
+use App\Filament\Resources\Books\Concerns\FetchesBookCover;
 
 class CreateBook extends CreateRecord
 {
+    use FetchesBookCover;
+
     protected static string $resource = BookResource::class;
     public function mount(?string $isbn = null):void{
         parent::mount();
@@ -34,37 +36,15 @@ class CreateBook extends CreateRecord
                 ->send();
         }
 
-        // Fetch the cover in a follow-up request instead of here, so the form
-        // is usable straight away while slow cover sources are still being tried.
-        $this->dispatch('lwfetchcover', isbn: $isbn);
+        // The cover is fetched from the browser afterwards, one source per
+        // request, so the form is usable immediately and the wait can be
+        // cancelled in favour of taking a photo.
+        $this->dispatch('start-cover-fetch', isbn: $isbn);
     }
 
     protected function mutateFormDataBeforeCreate(array $data):array{
         $data['user_id'] = auth()->id();
         return $data;
-    }
-
-    #[On('lwfetchcover')]
-    public function lwfetchcover($isbn){
-        $cover = BookApi::fetchCover($isbn);
-
-        // A missing cover is not an error: everything else about the book is
-        // already filled in, and the user can still upload one by hand.
-        if (!$cover) {
-            Notification::make()
-                ->title('No cover found')
-                ->body('Add one by hand if you have it.')
-                ->warning()
-                ->send();
-            return;
-        }
-
-        $this->data['cover'] = [$cover];
-
-        Notification::make()
-            ->title('Cover loaded')
-            ->success()
-            ->send();
     }
 
     protected function getFormActions(): array
