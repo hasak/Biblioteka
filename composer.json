@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "hasak/biblioteka",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "A self-hosted catalogue for a physical book collection, with ISBN barcode scanning, metadata lookup and cover fetching.",
+    "keywords": ["laravel", "filament", "books", "library", "catalogue", "isbn"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
