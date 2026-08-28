@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources\Books\Tables;
 
+use App\Filament\Forms\Components\SelectedBooksList;
+use App\Filament\Forms\Components\ShelfPositionInput;
 use App\Models\Book;
 
 use App\Models\Country;
 
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 
 use Filament\Actions\DeleteBulkAction;
@@ -13,6 +16,11 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -21,6 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class BooksTable
 {
@@ -123,11 +132,70 @@ class BooksTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    self::moveToShelfAction(),
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * Move a batch of books to one slot on the shelf.
+     *
+     * The modal puts the shelf grid next to the books it is about to move, and
+     * a book can be dropped from that list first — nothing is written until
+     * the modal is confirmed.
+     */
+    private static function moveToShelfAction(): BulkAction
+    {
+        return BulkAction::make('moveToShelf')
+            ->label('Move to shelf')
+            ->icon(Heroicon::OutlinedSquares2x2)
+            ->modalWidth(Width::FourExtraLarge)
+            ->modalSubmitActionLabel('Move')
+            ->fillForm(fn (Collection $records): array => [
+                'book_ids' => $records->pluck('id')->all(),
+                // A selection that already sits on one slot starts there.
+                'shelf_x' => $records->pluck('shelf_x')->unique()->count() === 1 ? $records->first()->shelf_x : null,
+                'shelf_y' => $records->pluck('shelf_y')->unique()->count() === 1 ? $records->first()->shelf_y : null,
+            ])
+            ->schema(fn (Collection $records): array => [
+                Grid::make(3)->schema([
+                    Section::make('New position')->schema([
+                        ShelfPositionInput::make('position')->hiddenLabel(),
+                        Grid::make(2)->schema([
+                            TextInput::make('shelf_x')->label('X')->numeric()->minValue(1)->maxValue(6)->required(),
+                            TextInput::make('shelf_y')->label('Y')->numeric()->minValue(1)->maxValue(6)->required(),
+                        ]),
+                    ])->columnSpan(2),
+                    Section::make('Books')->schema([
+                        SelectedBooksList::make('book_ids')
+                            ->label('Books')
+                            ->hiddenLabel()
+                            ->books($records->map(fn (Book $book): array => [
+                                'id' => $book->id,
+                                'title' => $book->title,
+                                'author' => $book->author,
+                                'position' => $book->position,
+                            ])->all())
+                            ->rules(['array', 'min:1']),
+                    ])->columnSpan(1),
+                ]),
+            ])
+            ->action(function (array $data): void {
+                // Straight to the database: the model's only hooks are about
+                // covers, and one statement beats loading every book.
+                $moved = Book::withTrashed()
+                    ->whereIn('id', $data['book_ids'])
+                    ->update(['shelf_x' => $data['shelf_x'], 'shelf_y' => $data['shelf_y']]);
+
+                Notification::make()
+                    ->title($moved . ' ' . str('book')->plural($moved) . " moved to shelf ({$data['shelf_x']},{$data['shelf_y']})")
+                    ->success()
+                    ->send();
+            })
+            ->deselectRecordsAfterCompletion();
     }
 }
