@@ -35,16 +35,17 @@ returning title, author, publisher, year and — where the language maps to a kn
 the language. A dead or slow third party is logged and treated as "no result" rather than
 being allowed to take the page down with it.
 
-**Covers.** Three sources are tried in order: Goodreads, Google Books, then Open Library.
+**Covers.** Three sources are asked in turn: Goodreads, Google Books, then Open Library.
 Goodreads has no public API, so its cover is read off the book page — searching for an ISBN
 redirects to that book and the page's `og:image` is the cover, the same trick
 [bookcover-api](https://github.com/w3slley/bookcover-api) uses. That search guesses when the
 number is not a real ISBN, so the checksum is verified first, and scraped markup can change
 overnight, which is why the API-backed sources stay behind it. The form
 walks them one request at a time so the browser can show which source is being tried and offer
-a Cancel button, instead of freezing on a slow host. Each candidate passes a quality gate —
-images narrower than 100px are rejected as placeholders, the search stops early once something
-at least 300px wide turns up, and anything over 16 MB is refused. Google's `zoom` parameter is
+a Cancel button, instead of freezing on a slow host. Each candidate passes a quality gate — images
+narrower than 100px are rejected as placeholders and anything over 16 MB is refused — and every
+source is asked before a winner is picked: the image with the most pixels takes it, and only
+that one is written to disk. Google's `zoom` parameter is
 exploited to ask for sizes larger than the thumbnail its API advertises. Accepted covers land
 in `storage/app/public/books/covers/<isbn>.<ext>`, with older spellings of the same ISBN
 cleaned up so orphans do not accumulate.

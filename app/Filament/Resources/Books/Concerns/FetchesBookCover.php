@@ -7,21 +7,21 @@ use App\Services\BookApi;
 /**
  * Cover fetching, one source per request.
  *
- * The browser drives the loop: it calls fetchCoverStep() for each source in
- * turn and stops as soon as one returns a cover big enough. Splitting it this
- * way is what makes the progress readable and the wait cancellable — cancelling
- * is simply the browser not asking for the next source.
+ * The browser drives the loop: it calls fetchCoverStep() for every source in
+ * turn and keeps the largest image of the lot. Splitting it this way is what
+ * makes the progress readable and the wait cancellable — cancelling is simply
+ * the browser not asking for the next source.
  */
 trait FetchesBookCover
 {
-    /** Widest cover found so far this run, so a later source cannot replace a better one. */
-    public int $coverBestWidth = 0;
+    /** Most pixels found so far this run, so a later source cannot replace a better one. */
+    public int $coverBestPixels = 0;
 
     /** Where that one was stored, so it can be put back if the field is cleared. */
     public ?string $coverBestPath = null;
 
     public function resetCoverFetch():void{
-        $this->coverBestWidth = 0;
+        $this->coverBestPixels = 0;
         $this->coverBestPath = null;
     }
 
@@ -40,17 +40,20 @@ trait FetchesBookCover
     }
 
     public function fetchCoverStep(string $isbn, string $source):array{
+        $isbn = str_replace('-', '', $isbn);
         $result = BookApi::fetchCoverFrom($isbn, $source);
 
         if(!$result){
-            return ['found' => false, 'good' => false, 'width' => 0];
+            return ['found' => false, 'good' => false, 'pixels' => 0];
         }
 
-        // Keep whichever source gave the biggest image, not simply the last one.
-        if($result['width'] > $this->coverBestWidth){
-            $this->coverBestWidth = $result['width'];
-            $this->coverBestPath = $result['path'];
-            $this->data['cover'] = [$result['path']];
+        // Only the biggest image of the run is written. Every source stores
+        // under the same file name, so keeping a smaller one would replace the
+        // better image already on disk.
+        if($result['pixels'] > $this->coverBestPixels){
+            $this->coverBestPixels = $result['pixels'];
+            $this->coverBestPath = BookApi::storeCover($isbn, $result);
+            $this->data['cover'] = [$this->coverBestPath];
         }
 
         return [
@@ -58,6 +61,7 @@ trait FetchesBookCover
             'good' => $result['width'] >= BookApi::$minCoverWidth,
             'width' => $result['width'],
             'height' => $result['height'],
+            'pixels' => $result['pixels'],
             'source' => $result['source'],
         ];
     }

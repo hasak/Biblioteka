@@ -140,10 +140,10 @@
 
                             if (run !== this.run) return;           // reply arrived after cancel
 
-                            if (result?.found && (! best || result.width > best.width)) {
+                            // Every source is asked; the most pixels wins.
+                            if (result?.found && (! best || result.pixels > best.pixels)) {
                                 best = result;
                             }
-                            if (result?.good) break;                // big enough, stop paying for more
                         }
 
                         this.finish(best);

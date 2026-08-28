@@ -147,32 +147,38 @@ class BookApi
     }
 
     /**
-     * Try every source in turn and keep the best cover found. Used from the
+     * Ask every source and keep the largest cover of them all. Used from the
      * console; the form calls fetchCoverFrom() one source at a time instead.
      */
     static function fetchCover(string $isbn):?string{
+        $isbn = str_replace('-', '', $isbn);
         $best = null;
 
         foreach(array_keys(self::COVER_SOURCES) as $source){
             $result = self::fetchCoverFrom($isbn, $source);
-            if($result && $result['width'] > ($best['width'] ?? 0))
+            if(self::pixels($result) > self::pixels($best))
                 $best = $result;
-            if($best && $best['width'] >= self::$minCoverWidth)
-                break;
         }
 
-        if(!$best)
+        if(!$best){
             Log::info('No cover found for ISBN', ['isbn'=>$isbn]);
+            return null;
+        }
 
-        return $best['path'] ?? null;
+        return self::storeCover($isbn, $best);
+    }
+
+    /** How much cover there is to look at. Nothing at all counts as zero. */
+    static function pixels(?array $cover):int{
+        return $cover ? $cover['width'] * $cover['height'] : 0;
     }
 
     /**
      * Fetch the best cover one single source can offer.
      *
-     * Returns null when the source has nothing, otherwise the stored path
-     * with the dimensions, so the caller can decide whether it is good
-     * enough to stop looking.
+     * The image itself is handed back rather than written to disk: all three
+     * sources store under the same file name, so only the winner of the whole
+     * run may be stored, and the caller is the one who knows the winner.
      */
     static function fetchCoverFrom(string $isbn, string $source):?array{
         $isbn = str_replace('-', '', $isbn);
@@ -185,9 +191,10 @@ class BookApi
             $candidate = self::downloadCover($url);
             if(!$candidate)
                 continue;
-            if($candidate['width'] > ($best['width'] ?? 0))
+            if(self::pixels($candidate) > self::pixels($best))
                 $best = $candidate;
-            // The first size that is big enough wins; no point paying for the rest.
+            // One source's candidates come largest first, so the first size
+            // that is big enough ends it; no point paying for the rest.
             if($best['width'] >= self::$minCoverWidth)
                 break;
         }
@@ -195,10 +202,8 @@ class BookApi
         if(!$best)
             return null;
 
-        return [
-            'path' => self::storeCover($isbn, $best),
-            'width' => $best['width'],
-            'height' => $best['height'],
+        return $best + [
+            'pixels' => self::pixels($best),
             'bytes' => strlen($best['body']),
             'source' => self::COVER_SOURCES[$source],
         ];
@@ -340,7 +345,8 @@ class BookApi
         return ['body'=>$body, 'extension'=>$extension, 'width'=>$size[0], 'height'=>$size[1]];
     }
 
-    private static function storeCover(string $isbn, array $cover):string{
+    /** Write one cover to disk, replacing whatever this ISBN had before. */
+    static function storeCover(string $isbn, array $cover):string{
         $path="books/covers/{$isbn}.{$cover['extension']}";
         $disk=Storage::disk('public');
 
