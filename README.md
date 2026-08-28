@@ -35,7 +35,12 @@ returning title, author, publisher, year and — where the language maps to a kn
 the language. A dead or slow third party is logged and treated as "no result" rather than
 being allowed to take the page down with it.
 
-**Covers.** Two sources are tried in order: Google Books, then Open Library. The form
+**Covers.** Three sources are tried in order: Goodreads, Google Books, then Open Library.
+Goodreads has no public API, so its cover is read off the book page — searching for an ISBN
+redirects to that book and the page's `og:image` is the cover, the same trick
+[bookcover-api](https://github.com/w3slley/bookcover-api) uses. That search guesses when the
+number is not a real ISBN, so the checksum is verified first, and scraped markup can change
+overnight, which is why the API-backed sources stay behind it. The form
 walks them one request at a time so the browser can show which source is being tried and offer
 a Cancel button, instead of freezing on a slow host. Each candidate passes a quality gate —
 images narrower than 100px are rejected as placeholders, the search stops early once something
@@ -121,5 +126,5 @@ database credentials.
 ## Licence
 
 MIT — see [LICENSE](LICENSE). Note that the licence covers this code only. Book metadata and
-cover images retrieved at runtime come from Google Books and Open Library, and carry
+cover images retrieved at runtime come from Goodreads, Google Books and Open Library, and carry
 those services' own terms.

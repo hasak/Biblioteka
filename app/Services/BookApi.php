@@ -36,11 +36,15 @@ class BookApi
     /** Too small to be a real cover at all; almost certainly a placeholder. */
     static int $rejectCoverWidth = 100;
 
+    /** Goodreads answers 403 to a request that does not name a browser. */
+    const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
     /**
      * Cover sources in the order they are tried. The form walks these one
      * request at a time so progress can be shown and the wait cancelled.
      */
     const COVER_SOURCES = [
+        'goodreads' => 'Goodreads',
         'google' => 'Google Books',
         'openlibrary' => 'Open Library',
     ];
@@ -76,9 +80,9 @@ class BookApi
      * unreachable host raises ConnectionException, and one dead third party
      * must never take the whole page down with it.
      */
-    private static function get(string $url, array $query = [], ?int $timeout = null):?Response{
+    private static function get(string $url, array $query = [], ?int $timeout = null, array $headers = []):?Response{
         try{
-            $response=Http::timeout($timeout ?? self::$timeout)->get($url, $query);
+            $response=Http::withHeaders($headers)->timeout($timeout ?? self::$timeout)->get($url, $query);
         }catch(\Throwable $e){
             Log::warning('BookApi request failed', ['url'=>$url, 'error'=>$e->getMessage()]);
             return null;
@@ -203,6 +207,7 @@ class BookApi
     /** Candidate URLs for one source, largest first. */
     private static function coverUrlsFrom(string $isbn, string $source):array{
         return match($source){
+            'goodreads' => self::goodreadsCoverUrls($isbn),
             'google' => self::googleCoverUrls($isbn),
             // default=false returns 404 rather than a blank placeholder.
             'openlibrary' => ["https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg?default=false"],
@@ -242,6 +247,75 @@ class BookApi
             : $base.'&zoom=6';
 
         return array_values(array_unique([$large, $base]));
+    }
+
+    /**
+     * Goodreads has no public API, so the cover is read off the page the way
+     * bookcover-api (github.com/w3slley/bookcover-api) does it: a search for
+     * the ISBN redirects to that book, and the page's og:image is the cover.
+     * Scraped markup can change overnight, which is why the other sources are
+     * still there behind it.
+     */
+    private static function goodreadsCoverUrls(string $isbn):array{
+        // The search guesses: a number that is not a real ISBN still lands on
+        // some unrelated book, whose cover would then be stored as this one's.
+        if(!self::isRealIsbn($isbn))
+            return [];
+
+        $response=self::get('https://www.goodreads.com/search', ['q'=>$isbn], self::$coverTimeout, [
+            'User-Agent'=>self::USER_AGENT,
+        ]);
+        if(!$response || !preg_match('/<meta property="og:image" content="([^"]+)"/', $response->body(), $match))
+            return [];
+
+        $url=html_entity_decode($match[1]);
+        // A book with no cover shows the Goodreads logo or a nophoto
+        // placeholder, both served from /assets/ rather than /books/. So is
+        // the search page itself, when the ISBN matched nothing at all.
+        if(!str_contains($url, '/books/'))
+            return [];
+
+        // A resized variant carries a token like ._SY475_ in the file name;
+        // without it Goodreads serves the original upload, the largest it has.
+        $original=preg_replace('/\._[^.\/]*_\./', '.', $url);
+
+        return array_values(array_unique([$original, $url]));
+    }
+
+    /**
+     * The EAN-13 and ISBN-10 checksums, the same ones the scan page validates
+     * with. Books entered without a real ISBN carry a sequential placeholder,
+     * and those must never be handed to a search that guesses.
+     */
+    private static function isRealIsbn(string $isbn):bool{
+        if(strlen($isbn) === 13){
+            if(!ctype_digit($isbn) || (!str_starts_with($isbn, '978') && !str_starts_with($isbn, '979')))
+                return false;
+
+            $sum=0;
+            foreach(str_split($isbn) as $i=>$digit)
+                $sum+=($i % 2 === 0) ? (int) $digit : 3 * (int) $digit;
+
+            return $sum % 10 === 0;
+        }
+
+        if(strlen($isbn) === 10){
+            if(!ctype_digit(substr($isbn, 0, 9)))
+                return false;
+
+            $last=strtoupper($isbn[9]);
+            if($last !== 'X' && !ctype_digit($last))
+                return false;
+
+            $sum=0;
+            foreach(str_split(substr($isbn, 0, 9)) as $i=>$digit)
+                $sum+=(10 - $i) * (int) $digit;
+            $sum+=($last === 'X') ? 10 : (int) $last;
+
+            return $sum % 11 === 0;
+        }
+
+        return false;
     }
 
     /** Download one candidate and measure it. Null if it is not a usable image. */

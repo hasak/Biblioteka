@@ -159,6 +159,10 @@
                         }
 
                         this.state = 'done';
+                        // A request racing the fetch can empty the upload
+                        // field; now that the page is quiet, have the server
+                        // put the cover back.
+                        this.$wire.applyFetchedCover();
                         this.label = best.good
                             ? `Cover loaded from ${best.source} (${best.width}×${best.height})`
                             : `Only a small cover found — ${best.width}×${best.height} from ${best.source}. A photo will look better.`;
@@ -168,6 +172,9 @@
                         this.run++;                                 // any in-flight reply is now stale
                         clearInterval(this.timer);
                         this.state = 'done';
+                        // Whatever a source managed to store before the wait
+                        // was called off is still worth keeping.
+                        this.$wire.applyFetchedCover();
                         this.label = 'Cover fetch cancelled — take a photo or upload one.';
                     },
                 }
