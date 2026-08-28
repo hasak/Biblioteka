@@ -43,7 +43,6 @@ class BookApi
     const COVER_SOURCES = [
         'google' => 'Google Books',
         'openlibrary' => 'Open Library',
-        'longitood' => 'Longitood',
     ];
 
     static function coverSources():array{
@@ -207,7 +206,6 @@ class BookApi
             'google' => self::googleCoverUrls($isbn),
             // default=false returns 404 rather than a blank placeholder.
             'openlibrary' => ["https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg?default=false"],
-            'longitood' => array_filter([self::longitoodCoverUrl($isbn)]),
             default => [],
         };
     }
@@ -244,14 +242,6 @@ class BookApi
             : $base.'&zoom=6';
 
         return array_values(array_unique([$large, $base]));
-    }
-
-    private static function longitoodCoverUrl(string $isbn):?string{
-        // Unreachable since at least Aug 2026, so it gets a short leash.
-        $response=self::get("https://bookcover.longitood.com/bookcover/{$isbn}", [], 3);
-        $url=$response?->json('url');
-
-        return is_string($url) ? $url : null;
     }
 
     /** Download one candidate and measure it. Null if it is not a usable image. */
