@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Series\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Series\SeriesResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewSeries extends ViewRecord
 {

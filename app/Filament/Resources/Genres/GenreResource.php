@@ -6,6 +6,7 @@ use App\Filament\Resources\Genres\Pages\CreateGenre;
 use App\Filament\Resources\Genres\Pages\EditGenre;
 use App\Filament\Resources\Genres\Pages\ListGenres;
 use App\Filament\Resources\Genres\Pages\ViewGenre;
+use App\Filament\Resources\Genres\RelationManagers\BooksRelationManager;
 use App\Filament\Resources\Genres\Schemas\GenreForm;
 use App\Filament\Resources\Genres\Schemas\GenreInfolist;
 use App\Filament\Resources\Genres\Tables\GenresTable;
@@ -15,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Filament\Resources\Genres\RelationManagers\BooksRelationManager;
 
 class GenreResource extends Resource
 {

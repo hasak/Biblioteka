@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Genres\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Genres\GenreResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewGenre extends ViewRecord
 {

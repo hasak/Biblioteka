@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources\Books\Schemas;
 
-use App\Models\Book;
-
-use Filament\Support\Icons\Heroicon;
-use Filament\Schemas\Components\Grid;
-use Filament\Support\Enums\FontWeight;
-use Filament\Schemas\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
-use Filament\Infolists\Components\ImageEntry;
 use App\Filament\Infolists\Components\ShelfPositionEntry;
+
+use App\Models\Book;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 
 class BookInfolist
 {

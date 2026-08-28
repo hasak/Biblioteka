@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\Books;
 
-use Filament\Actions\CreateAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
 use App\Filament\Resources\Books\Pages\CreateBook;
 use App\Filament\Resources\Books\Pages\EditBook;
 use App\Filament\Resources\Books\Pages\ListBooks;
@@ -14,9 +11,12 @@ use App\Filament\Resources\Books\Schemas\BookInfolist;
 use App\Filament\Resources\Books\Tables\BooksTable;
 use App\Models\Book;
 use BackedEnum;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class BookResource extends Resource

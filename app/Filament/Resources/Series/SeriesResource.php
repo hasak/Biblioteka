@@ -6,6 +6,7 @@ use App\Filament\Resources\Series\Pages\CreateSeries;
 use App\Filament\Resources\Series\Pages\EditSeries;
 use App\Filament\Resources\Series\Pages\ListSeries;
 use App\Filament\Resources\Series\Pages\ViewSeries;
+use App\Filament\Resources\Series\RelationManagers\BooksRelationManager;
 use App\Filament\Resources\Series\Schemas\SeriesForm;
 use App\Filament\Resources\Series\Schemas\SeriesInfolist;
 use App\Filament\Resources\Series\Tables\SeriesTable;
@@ -15,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Filament\Resources\Series\RelationManagers\BooksRelationManager;
 
 class SeriesResource extends Resource
 {

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use Filament\Tables\Columns\TextColumn;
 use App\Filament\Resources\Countries\CountryResource;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CountriesRelationManager extends RelationManager

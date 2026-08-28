@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Languages\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Languages\LanguageResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewLanguage extends ViewRecord
 {

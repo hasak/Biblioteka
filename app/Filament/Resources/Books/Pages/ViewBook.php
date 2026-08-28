@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Books\Pages;
 
+use App\Filament\Resources\Books\BookResource;
 use App\Models\Book;
 use Filament\Actions\Action;
-use Illuminate\Contracts\Support\Htmlable;
-use App\Filament\Resources\Books\BookResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewBook extends ViewRecord
 {

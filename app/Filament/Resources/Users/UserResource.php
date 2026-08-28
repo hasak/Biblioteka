@@ -6,6 +6,11 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
+use App\Filament\Resources\Users\RelationManagers\BooksRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CountriesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\GenresRelationManager;
+use App\Filament\Resources\Users\RelationManagers\LanguagesRelationManager;
+use App\Filament\Resources\Users\RelationManagers\SeriesRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -15,11 +20,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Filament\Resources\Users\RelationManagers\BooksRelationManager;
-use App\Filament\Resources\Users\RelationManagers\GenresRelationManager;
-use App\Filament\Resources\Users\RelationManagers\SeriesRelationManager;
-use App\Filament\Resources\Users\RelationManagers\CountriesRelationManager;
-use App\Filament\Resources\Users\RelationManagers\LanguagesRelationManager;
 
 class UserResource extends Resource
 {

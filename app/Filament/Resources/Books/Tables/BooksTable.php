@@ -4,23 +4,23 @@ namespace App\Filament\Resources\Books\Tables;
 
 use App\Models\Book;
 
-use Illuminate\Database\Eloquent\Builder;
-
 use App\Models\Country;
 
-use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
+
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\ImageColumn;
+use Illuminate\Database\Eloquent\Builder;
 
 class BooksTable
 {

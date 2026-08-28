@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Users\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewUser extends ViewRecord
 {

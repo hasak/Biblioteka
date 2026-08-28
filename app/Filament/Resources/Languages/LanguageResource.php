@@ -6,6 +6,7 @@ use App\Filament\Resources\Languages\Pages\CreateLanguage;
 use App\Filament\Resources\Languages\Pages\EditLanguage;
 use App\Filament\Resources\Languages\Pages\ListLanguages;
 use App\Filament\Resources\Languages\Pages\ViewLanguage;
+use App\Filament\Resources\Languages\RelationManagers\BooksRelationManager;
 use App\Filament\Resources\Languages\Schemas\LanguageForm;
 use App\Filament\Resources\Languages\Schemas\LanguageInfolist;
 use App\Filament\Resources\Languages\Tables\LanguagesTable;
@@ -15,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Filament\Resources\Languages\RelationManagers\BooksRelationManager;
 
 class LanguageResource extends Resource
 {

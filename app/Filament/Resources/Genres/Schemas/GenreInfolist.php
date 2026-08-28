@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\Genres\Schemas;
 
-use Filament\Support\Enums\TextSize;
-use Filament\Schemas\Components\Grid;
-use Filament\Support\Enums\FontWeight;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class GenreInfolist

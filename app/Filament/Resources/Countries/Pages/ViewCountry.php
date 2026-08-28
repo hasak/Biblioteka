@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Countries\Pages;
 
-use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\Countries\CountryResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewCountry extends ViewRecord
 {

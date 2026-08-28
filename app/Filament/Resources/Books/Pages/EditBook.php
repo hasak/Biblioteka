@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\Books\Pages;
 
 use App\Filament\Resources\Books\BookResource;
+use App\Filament\Resources\Books\Concerns\FetchesBookCover;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\Books\Concerns\FetchesBookCover;
 
 class EditBook extends EditRecord
 {
